@@ -22,10 +22,9 @@ public class SpringSecurityConfig {
 
   @Bean
   SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf().disable()
-        .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-            .requestMatchers("/saveTeacher").hasRole("TEACHER")
-            .anyRequest().authenticated())
+    http.authorizeHttpRequests(
+            authorizeRequests -> authorizeRequests
+                .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
         .httpBasic(Customizer.withDefaults());
     return http.build();
@@ -35,9 +34,12 @@ public class SpringSecurityConfig {
   UserDetailsService userDetailsService() {
     UserDetails student = User.withUsername("student1").password("{noop}password1").roles("STUDENT")
         .build();
+    UserDetails student1 = User.withUsername("student2").password("{noop}password2")
+        .roles("STUDENT")
+        .build();
     UserDetails teacher = User.withUsername("teacher1").password("{noop}password11")
         .roles("TEACHER")
         .build();
-    return new InMemoryUserDetailsManager(student, teacher);
+    return new InMemoryUserDetailsManager(student, student1, teacher);
   }
 }
